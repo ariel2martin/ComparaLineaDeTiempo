@@ -1,0 +1,32 @@
+{
+    "visual": {
+        "name": "ComparaLineaDeTiempo",
+        "displayName": "ComparaLineaDeTiempo",
+        "guid": "ComparaLineaDeTiempoV2_2",
+        "visualClassName": "Visual",
+        "version": "1.1.0.0",
+        "description": "comparar lineas de tiempo",
+        "supportUrl": "https://ariel2martin.github.io/presentacion/dist/",
+        "gitHubUrl": "https://ariel2martin.github.io/presentacion/dist/"
+    },
+    "apiVersion": "^5.11.0",
+    "author": {
+        "name": "Ariel Martin",
+        "email": "ariel2martin@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png",
+        "js": [
+            "assets/d3-timeline.js"
+        ]
+    },
+    "externalJS": null,
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": [],
+    "version": "2.0.0.0",
+    "formattingModel": true
+}
+
+

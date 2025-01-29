@@ -1,0 +1,146 @@
+{
+    "dataRoles": [
+        {
+            "name": "equipo",
+            "kind": "Grouping",
+            "displayName": "Grupo"
+        },
+        
+
+        {
+            "name": "inicio",
+            "kind": "Grouping",
+            "displayName": "Inicio"
+        },
+        {
+            "name": "fin",
+            "kind": "Grouping",
+            "displayName": "Fin"
+        },
+        {
+            "name": "etiqueta",
+            "kind": "Grouping",
+            "displayName": "Etiqueta"
+        },{
+            "name": "color",
+            "kind": "Grouping",
+            "displayName": "Color"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "categorical": {
+                "categories": {
+                    
+                    "group": [
+                        {
+                            "source": "equipo",
+                            "bind": {
+                                "to": "equipo"
+                            }
+                        },
+                       
+                        {
+                            "source": "inicio",
+                            "bind": {
+                                "to": "inicio"
+                            }
+                        },
+                        {
+                            "source": "fin",
+                            "bind": {
+                                "to": "fin"
+                            }
+                        },
+                        {
+                            "source": "etiqueta",
+                            "bind": {
+                                "to": "etiqueta"
+                            }
+                        }, {
+                            "source": "color",
+                            "bind": {
+                                "to": "color"
+                            }
+                        }
+                    ],
+                    "select": [
+                        {
+                            "bind": {
+                                "to": "equipo"
+                            }
+                        },
+                        
+                        
+                        {
+                            "bind": {
+                                "to": "inicio"
+                            }
+                        },
+                        {
+                            "bind": {
+                                "to": "fin"
+                            }
+                        },{
+                            "bind": {
+                                "to": "etiqueta"
+                            }
+                        },{
+                            "bind": {
+                                "to": "color"
+                            }
+                        }
+                    ]
+                },
+                "values": {
+                    "select": [
+                        
+                    ]
+                }
+            }
+        }
+    ],
+    "objects": {
+        "settings": {
+            "displayName": "Configuración",
+            "properties": {
+                "color": {
+                    "displayName": "Color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "label": {
+                    "displayName": "Etiqueta",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "starting_time": {
+                    "displayName": "Hora de inicio",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "ending_time": {
+                    "displayName": "Hora de finalización",
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
+        }
+    },
+    "supportsHighlight": true,
+    "sorting": {
+        "default": {}
+    },
+    "drilldown": {
+        "roles": []
+    },
+    "privileges": []
+}
