@@ -35,11 +35,17 @@ export class Visual implements IVisual {
 
   public update(options: VisualUpdateOptions): void {
     // en esta version solo tomará maximo 48hs, para que no colapse
-    const CantHorasMaximasEnLineaDeTiempo =48 // el eje X
-    const CantMaxEquiposAComparar = 25 //el eje Y
-    const CantMaxregistros = 10000 //el eje Y
-    const MensajeExceso = "Maximo alcanzado, se muestran hasta " + CantMaxEquiposAComparar + " lineas, " + CantHorasMaximasEnLineaDeTiempo + " Horas y " + CantMaxregistros + " registros"
-
+    const CantHorasMaximasEnLineaDeTiempo = 48; // el eje X
+    const CantMaxEquiposAComparar = 25; //el eje Y
+    const CantMaxregistros = 500;
+    const MensajeExceso =
+      "Maximo alcanzado, se muestran hasta " +
+      CantMaxEquiposAComparar +
+      " lineas, " +
+      CantHorasMaximasEnLineaDeTiempo +
+      " Horas y " +
+      CantMaxregistros +
+      " registros";
 
     // Dimensiones del contenedor
     const width = options.viewport.width;
@@ -62,13 +68,7 @@ export class Visual implements IVisual {
       times: TimeEntry[];
     }
     function transformData(dataView: DataView): grupoData[] {
-
-
-      
-      
-
       //el codigo para ver si hay etiqueta y si hay color, está bien. Pero se podria optimizar
-
       if (!dataView || !dataView.categorical) return [];
       const hayonohay = dataView?.categorical?.categories || [];
       const hasEtiqueta = hayonohay.some(
@@ -83,131 +83,128 @@ export class Visual implements IVisual {
       const hasColorDonde = hayonohay.findIndex(
         (category) => category.source.roles?.color
       );
+
       const grupos = dataView.categorical.categories?.[0]
         .values as PrimitiveValue[];
-      const colores =
-        hasColor
-          ? (dataView.categorical.categories[hasColorDonde]?.values as
+      const colores = hasColor
+        ? (dataView.categorical.categories[hasColorDonde]?.values as
             | PrimitiveValue[]
             | undefined)
-          : undefined;
-      const etiquetas =
-        hasEtiqueta
-          ? (dataView.categorical.categories[hasEtiquetaDonde]?.values as
+        : undefined;
+      const etiquetas = hasEtiqueta
+        ? (dataView.categorical.categories[hasEtiquetaDonde]?.values as
             | PrimitiveValue[]
             | undefined)
-          : undefined;
+        : undefined;
       const inicios = dataView.categorical.categories?.[1]
         .values as PrimitiveValue[];
       const fines = dataView.categorical.categories?.[2]
         .values as PrimitiveValue[];
       //no uso const details = dataView.categorical.values?.[0].values as PrimitiveValue[];
-      
-      
-      let FechaInicialGrafico = formatoFechaHora('1/1/2030 11:22:33')
-      //console.log(FechaInicialGrafico)
-      for (let i = 0; i < inicios.length; i++) {
-        if (formatoFechaHora(inicios[i]) < FechaInicialGrafico) {
-          FechaInicialGrafico = formatoFechaHora(inicios[i])
-        }
-      }
-      /* verifica
-      console.log(FechaInicialGrafico)
-      const starting_time = new Date(FechaInicialGrafico);
-      const aux2 = `${starting_time.getDate()}/${starting_time.getMonth() + 1}/${starting_time.getFullYear()} ${starting_time.getHours()}:${starting_time.getMinutes()}`;
-      console.log(aux2)
-      */
-
 
       const grupoMap: { [key: string]: TimeEntry[] } = {};
+      if (grupos.length > CantMaxregistros) {
+        console.log("exceso en registros ", grupos.length);
+        const grupo = MensajeExceso;
 
-      for (let i = 0; i < grupos.length && i < CantMaxregistros; i++) {
-     
-        let grupo = grupos[i] as string; // Nombre del equipo
-        const color: string = colores?.[i] ? String(colores[i]) : "blue";
-        const etiqueta: string = etiquetas?.[i] ? String(etiquetas[i]) : "";
-        const inicio = inicios[i] as string;
-        const fin = fines[i] as string;
-
-        if (!grupo) continue; //obligatorio
-        if (formatoFechaHora(fin) > FechaInicialGrafico + CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000) {
-          //console.log(FechaInicialGrafico)
-          //console.log(FechaInicialGrafico + CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000)
-          //console.log (fin)
-          continue; //maximo 48Hs en el grafico
-        }
-        //console.log(Object.keys(grupoMap).length)
-        if (Object.keys(grupoMap).length == CantMaxEquiposAComparar) { grupo = MensajeExceso };
-        if (Object.keys(grupoMap).length > CantMaxEquiposAComparar) continue;
         if (!grupoMap[grupo]) {
           grupoMap[grupo] = [];
         }
-        
-        
-        if (etiquetas?.[i] == "Fin Gdia") {
-
-          const timeEntry: TimeEntry = {
-            color: color || "blue",
-            label: "",
-            EtiquetaTooltip: etiqueta || "",
-            starting_time: formatoFechaHora(inicio) || 0,
-            display: "fin",
-          };
-          grupoMap[grupo].push(timeEntry);
+      } else {
+        let FechaInicialGrafico = formatoFechaHora("1/1/2030 11:22:33");
+        //console.log(FechaInicialGrafico)
+        for (let i = 0; i < inicios.length; i++) {
+          if (formatoFechaHora(inicios[i]) < FechaInicialGrafico) {
+            FechaInicialGrafico = formatoFechaHora(inicios[i]);
+          }
         }
-        else {
+        /* verifica
+        console.log(FechaInicialGrafico)
+        const starting_time = new Date(FechaInicialGrafico);
+        const aux2 = `${starting_time.getDate()}/${starting_time.getMonth() + 1}/${starting_time.getFullYear()} ${starting_time.getHours()}:${starting_time.getMinutes()}`;
+        console.log(aux2)
+        */
 
-          if (etiquetas?.[i] == "inicio Gdia") {
+        for (let i = 0; i < grupos.length; i++) {
+          let grupo = grupos[i] as string; // Nombre del equipo
+          const color: string = colores?.[i] ? String(colores[i]) : "blue";
+          const etiqueta: string = etiquetas?.[i] ? String(etiquetas[i]) : "";
+          const inicio = inicios[i] as string;
+          const fin = fines[i] as string;
 
+          if (!grupo) continue; //obligatorio
+          if (
+            formatoFechaHora(fin) >
+            FechaInicialGrafico +
+              CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000
+          ) {
+            //console.log(FechaInicialGrafico)
+            //console.log(FechaInicialGrafico + CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000)
+            //console.log (fin)
+            grupo = MensajeExceso;
+            grupoMap[grupo] = [];
+            continue; //maximo 48Hs en el grafico
+          }
+          //console.log(Object.keys(grupoMap).length)
+          if (Object.keys(grupoMap).length == CantMaxEquiposAComparar) {
+            grupo = MensajeExceso;
+          }
+          if (Object.keys(grupoMap).length > CantMaxEquiposAComparar) continue;
+          if (!grupoMap[grupo]) {
+            grupoMap[grupo] = [];
+          }
+
+          if (etiquetas?.[i] == "Fin Gdia") {
             const timeEntry: TimeEntry = {
               color: color || "blue",
               label: "",
               EtiquetaTooltip: etiqueta || "",
               starting_time: formatoFechaHora(inicio) || 0,
-              display: "inicio",
+              display: "fin",
             };
             grupoMap[grupo].push(timeEntry);
-          }
-
-          else {
-            if (inicio >= fin) {
-
-              const timeEntry: TimeEntry = {
-                color: "red",
-                label: "",
-                EtiquetaTooltip: etiqueta || "",
-                starting_time: formatoFechaHora(inicio) || 0,
-                display: "circle",
-              };
-              //console.log(etiquetas?.[i], timeEntry)
-              grupoMap[grupo].push(timeEntry);
-            } else {
+          } else {
+            if (etiquetas?.[i] == "inicio Gdia") {
               const timeEntry: TimeEntry = {
                 color: color || "blue",
                 label: "",
                 EtiquetaTooltip: etiqueta || "",
                 starting_time: formatoFechaHora(inicio) || 0,
-                ending_time: formatoFechaHora(fin) || 0,
+                display: "inicio",
               };
               grupoMap[grupo].push(timeEntry);
+            } else {
+              if (inicio >= fin) {
+                const timeEntry: TimeEntry = {
+                  color: "red",
+                  label: "",
+                  EtiquetaTooltip: etiqueta || "",
+                  starting_time: formatoFechaHora(inicio) || 0,
+                  display: "circle",
+                };
+                //console.log(etiquetas?.[i], timeEntry)
+                grupoMap[grupo].push(timeEntry);
+              } else {
+                const timeEntry: TimeEntry = {
+                  color: color || "blue",
+                  label: "",
+                  EtiquetaTooltip: etiqueta || "",
+                  starting_time: formatoFechaHora(inicio) || 0,
+                  ending_time: formatoFechaHora(fin) || 0,
+                };
+                grupoMap[grupo].push(timeEntry);
+              }
             }
           }
         }
       }
-
       return Object.keys(grupoMap).map((grupo) => ({
         label: grupo,
         times: grupoMap[grupo],
       }));
     }
 
-
-
-
-
     const testData2 = transformData(options.dataViews[0]);
-
-
 
     var chart = timeline()
       .stack()
@@ -222,18 +219,22 @@ export class Visual implements IVisual {
         const cy = d.srcElement.getAttribute("cy");
         const yPosition = cy ? parseFloat(cy) : null;
 
-        const starting_time = new Date(d.srcElement.__data__.starting_time); 
-        const inicio = `${starting_time.getDate()}/${starting_time.getMonth() + 1}/${starting_time.getFullYear()} ${starting_time.getHours()}:${starting_time.getMinutes()}`;
-        const ending_time = new Date(d.srcElement.__data__.ending_time); 
-        const fin = d.srcElement.__data__.ending_time ?  `${ending_time.getDate()}/${ending_time.getMonth() + 1}/${ending_time.getFullYear()} ${ending_time.getHours()}:${ending_time.getMinutes()}` : '';
+        const starting_time = new Date(d.srcElement.__data__.starting_time);
+        const inicio = `${starting_time.getDate()}/${
+          starting_time.getMonth() + 1
+        }/${starting_time.getFullYear()} ${starting_time.getHours()}:${starting_time.getMinutes()}`;
+        const ending_time = new Date(d.srcElement.__data__.ending_time);
+        const fin = d.srcElement.__data__.ending_time
+          ? `${ending_time.getDate()}/${
+              ending_time.getMonth() + 1
+            }/${ending_time.getFullYear()} ${ending_time.getHours()}:${ending_time.getMinutes()}`
+          : "";
 
         tooltip.show(
           ` ${d.srcElement.__data__.EtiquetaTooltip}<br><strong></strong> ${inicio}<br><strong>Hasta:</strong> ${fin}`,
           xPosition,
           yPosition
         );
-
-
       })
       .click(function (d, i, datum, event) {
         /*
@@ -244,7 +245,6 @@ export class Visual implements IVisual {
         console.log(starting_time)
         console.log(inicios)
         */
-
       });
     d3.select(this.target)
       .append("svg")
@@ -263,7 +263,9 @@ export class Visual implements IVisual {
   }
 }
 
-export function createTooltip(container: d3.Selection<HTMLElement, unknown, null, undefined>) {
+export function createTooltip(
+  container: d3.Selection<HTMLElement, unknown, null, undefined>
+) {
   // Create a tooltip element
   const tooltip = container
     .append("div")
