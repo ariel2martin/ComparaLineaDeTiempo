@@ -37,7 +37,7 @@ export class Visual implements IVisual {
     // en esta version solo tomará maximo 48hs, para que no colapse
     const CantHorasMaximasEnLineaDeTiempo = 48; // el eje X
     const CantMaxEquiposAComparar = 25; //el eje Y
-    const CantMaxregistros = 500;
+    const CantMaxregistros = 1000;  //no pude aumentar esto en capabilities.json
     const MensajeExceso =
       "Maximo alcanzado, se muestran hasta " +
       CantMaxEquiposAComparar +
@@ -71,12 +71,24 @@ export class Visual implements IVisual {
       //el codigo para ver si hay etiqueta y si hay color, está bien. Pero se podria optimizar
       if (!dataView || !dataView.categorical) return [];
       const hayonohay = dataView?.categorical?.categories || [];
+      let equipoCategoria = hayonohay?.find(c => c.source.roles["equipo"]);
+      let inicioCategoria = hayonohay?.find(c => c.source.roles["inicio"]);
+      let finCategoria = hayonohay?.find(c => c.source.roles["fin"]);
+      let hasGrupo = equipoCategoria && equipoCategoria.values.length > 0;
+      let hasInicio = inicioCategoria && inicioCategoria.values.length > 0;
+      let hasFin = finCategoria && finCategoria.values.length > 0;
+      
+      if (!hasGrupo || !hasInicio || !hasFin) { d3.select(this.target).selectAll("*").remove(); return []; }
+
+
       const hasEtiqueta = hayonohay.some(
         (category) => category.source.roles?.etiqueta
       );
       const hasEtiquetaDonde = hayonohay.findIndex(
         (category) => category.source.roles?.etiqueta
       );
+
+   
       const hasColor = hayonohay.some(
         (category) => category.source.roles?.color
       );
@@ -101,9 +113,9 @@ export class Visual implements IVisual {
       const fines = dataView.categorical.categories?.[2]
         .values as PrimitiveValue[];
       //no uso const details = dataView.categorical.values?.[0].values as PrimitiveValue[];
-
+      
       const grupoMap: { [key: string]: TimeEntry[] } = {};
-      if (grupos.length > CantMaxregistros) {
+      if (grupos.length >= CantMaxregistros) {
         console.log("exceso en registros ", grupos.length);
         const grupo = MensajeExceso;
 
@@ -111,6 +123,7 @@ export class Visual implements IVisual {
           grupoMap[grupo] = [];
         }
       } else {
+        
         let FechaInicialGrafico = formatoFechaHora("1/1/2030 11:22:33");
         //console.log(FechaInicialGrafico)
         for (let i = 0; i < inicios.length; i++) {
@@ -203,12 +216,14 @@ export class Visual implements IVisual {
         times: grupoMap[grupo],
       }));
     }
+    
 
     const testData2 = transformData(options.dataViews[0]);
 
     var chart = timeline()
       .stack()
       .margin({ left: 220, right: 40, top: 0, bottom: 0 })
+            
       .hover(function (d, i, datum, event) {
         // d is the current rendering object
         // i is the index during d3 rendering
@@ -229,13 +244,21 @@ export class Visual implements IVisual {
               ending_time.getMonth() + 1
             }/${ending_time.getFullYear()} ${ending_time.getHours()}:${ending_time.getMinutes()}`
           : "";
-
+        /*
         tooltip.show(
           ` ${d.srcElement.__data__.EtiquetaTooltip}<br><strong></strong> ${inicio}<br><strong>Hasta:</strong> ${fin}`,
           xPosition,
           yPosition
         );
+        */
+        tooltip.show(
+          `<strong> ${d.srcElement.__data__.EtiquetaTooltip}<br></strong>`,
+          xPosition,
+          yPosition -40
+        );
       })
+      
+
       .click(function (d, i, datum, event) {
         /*
         console.log(event)
@@ -245,6 +268,25 @@ export class Visual implements IVisual {
         console.log(starting_time)
         console.log(inicios)
         */
+        const cx = d.srcElement.getAttribute("cx");
+        const xPosition = cx ? parseFloat(cx) : null;
+        const cy = d.srcElement.getAttribute("cy");
+        const yPosition = cy ? parseFloat(cy) : null;
+
+        const starting_time = new Date(d.srcElement.__data__.starting_time);
+        const inicio = `${starting_time.getDate()}/${starting_time.getMonth() + 1
+          }/${starting_time.getFullYear()} ${starting_time.getHours()}:${starting_time.getMinutes()}`;
+        const ending_time = new Date(d.srcElement.__data__.ending_time);
+        const fin = d.srcElement.__data__.ending_time
+          ? `${ending_time.getDate()}/${ending_time.getMonth() + 1
+          }/${ending_time.getFullYear()} ${ending_time.getHours()}:${ending_time.getMinutes()}`
+          : "";
+
+        tooltip.show(
+          ` ${d.srcElement.__data__.EtiquetaTooltip}<br><strong></strong> ${inicio}<br><strong>Hasta:</strong> ${fin}`,
+          xPosition,
+          yPosition
+        );
       });
     d3.select(this.target)
       .append("svg")

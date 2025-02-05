@@ -38,6 +38,7 @@
                             "bind": {
                                 "to": "equipo"
                             }
+
                         },
                        
                         {
@@ -45,23 +46,27 @@
                             "bind": {
                                 "to": "inicio"
                             }
+
                         },
                         {
                             "source": "fin",
                             "bind": {
                                 "to": "fin"
                             }
+
                         },
                         {
                             "source": "etiqueta",
                             "bind": {
                                 "to": "etiqueta"
                             }
+
                         }, {
                             "source": "color",
                             "bind": {
                                 "to": "color"
                             }
+
                         }
                     ],
                     "select": [
@@ -93,9 +98,7 @@
                     ]
                 },
                 "values": {
-                    "select": [
-                        
-                    ]
+                    "select": []
                 }
             }
         }
