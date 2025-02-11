@@ -173,6 +173,7 @@ export class Visual implements IVisual {
               label: "",
               EtiquetaTooltip: etiqueta || "",
               starting_time: formatoFechaHora(inicio) || 0,
+              ending_time: formatoFechaHora(fin) || 0,
               display: "fin",
             };
             grupoMap[grupo].push(timeEntry);
@@ -183,6 +184,7 @@ export class Visual implements IVisual {
                 label: "",
                 EtiquetaTooltip: etiqueta || "",
                 starting_time: formatoFechaHora(inicio) || 0,
+                ending_time: formatoFechaHora(fin) || 0,
                 display: "inicio",
               };
               grupoMap[grupo].push(timeEntry);
@@ -193,6 +195,7 @@ export class Visual implements IVisual {
                   label: "",
                   EtiquetaTooltip: etiqueta || "",
                   starting_time: formatoFechaHora(inicio) || 0,
+                  ending_time: formatoFechaHora(inicio) || 0,
                   display: "circle",
                 };
                 //console.log(etiquetas?.[i], timeEntry)
