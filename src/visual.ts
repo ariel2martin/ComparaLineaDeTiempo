@@ -1,5 +1,5 @@
-//Inicio y fin en formato texo,   d/M/yyyy HH:mm:ss  osea 24hs sin am/pm
-//FORMAT(F.Inicio, 'd/M/yyyy HH:mm:ss') Inicio,
+//Inicio y fin en formato texo,   d/M/yyyy HH:mm:ss  osea 24hs sin am/pm FORMAT(F.Inicio, 'd/M/yyyy HH:mm:ss') Inicio,
+// o formato 'yyyy-mm-dd hh:mm:ss'  CONVERT( VARCHAR, fecha ,120 )
 
 //si está la etiqueta se va a ver en el tooltip
 // hay dos casos especiales de etiqueta: "inicio Gdia" y "fin Gdia" que va a dibujar semicirculos
@@ -299,11 +299,38 @@ export class Visual implements IVisual {
       .call(chart);
 
     function formatoFechaHora(dateString) {
-      // recibe dd/mm/yyyy hh:mm:ss  y lo pasaa a numero entero
-      let [datePart, timePart] = dateString.split(" ");
-      let [day, month, year] = datePart.split("/").map(Number);
-      let [hours, minutes, seconds] = timePart.split(":").map(Number);
-      return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
+      // Detecta si el formato es 'dd/mm/yyyy hh:mm:ss' o 'yyyy-mm-dd hh:mm:ss'
+      let datePart, timePart;
+
+      if (dateString.includes("/")) {
+        // Formato 'dd/mm/yyyy hh:mm:ss'
+        [datePart, timePart] = dateString.split(" ");
+        let [day, month, year] = datePart.split("/").map(Number);
+        let [hours, minutes, seconds] = timePart.split(":").map(Number);
+        return new Date(
+          year,
+          month - 1,
+          day,
+          hours,
+          minutes,
+          seconds
+        ).getTime();
+      } else if (dateString.includes("-")) {
+        // Formato 'yyyy-mm-dd hh:mm:ss' (SQL)
+        [datePart, timePart] = dateString.split(" ");
+        let [year, month, day] = datePart.split("-").map(Number);
+        let [hours, minutes, seconds] = timePart.split(":").map(Number);
+        return new Date(
+          year,
+          month - 1,
+          day,
+          hours,
+          minutes,
+          seconds
+        ).getTime();
+      } else {
+        throw new Error("Formato de fecha no reconocido");
+      }
     }
   }
 }
