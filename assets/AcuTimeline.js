@@ -25,8 +25,10 @@
       rowSeparatorsColor = null,
       backgroundColor = null,
       tickFormat = {
-        format: d3.timeFormat("%I %p"),
-        tickTime: d3.timeHour,
+        formatDia: d3.timeFormat("%e%b"),
+        formatHora: d3.timeFormat("%H"),
+        tickTimeDia: d3.timeDay,
+        tickTimeHora: d3.timeHour,
         tickInterval: 1,
         tickSize: 6,
         tickValues: null,
@@ -390,7 +392,7 @@ click(d, index, datum, point, xScale.invert(point[0]));
         default:
           throw new Error("Orientación no válida: " + orient);
       }
-
+      
       if (timeIsLinear) {
         xScale = d3
           .scaleLinear()
@@ -406,19 +408,43 @@ click(d, index, datum, point, xScale.invert(point[0]));
           .scaleTime()
           .domain([beginning, ending])
           .range([margin.left, width - margin.right]);
-
-        xAxis
-          .scale(xScale)
-          .tickFormat(tickFormat.format)
-          .tickSize(tickFormat.tickSize);
+        // que la linea de tiempo sea en dias en vez de horas si super las 72Hs
+        if (ending - beginning > 72 * 60 * 60 * 1000){
+          xAxis
+            .scale(xScale)
+            .tickFormat(tickFormat.formatDia)
+            .tickSize(tickFormat.tickSize);
+        }
+        else {
+          xAxis
+            .scale(xScale)
+            .tickFormat(tickFormat.formatHora)
+            .tickSize(tickFormat.tickSize);
+        }
+        
       }
       if (tickFormat.tickValues != null) {
         xAxis.tickValues(tickFormat.tickValues);
       } else {
-        xAxis.ticks(
-          tickFormat.numTicks || tickFormat.tickTime,
-          tickFormat.tickInterval
-        );
+
+        if (ending - beginning > 72 * 60 * 60 * 1000) {
+          xAxis.ticks(
+            tickFormat.numTicks || tickFormat.tickTimeDia,
+            tickFormat.tickInterval
+          );
+        }
+        else {
+          xAxis.ticks(
+            tickFormat.numTicks || tickFormat.tickTimeHora,
+            tickFormat.tickInterval
+          );
+        }
+
+
+
+
+
+
       }
 
       // append a view for zoom/pan support
@@ -1146,27 +1172,9 @@ click(d, index, datum, point, xScale.invert(point[0]));
     timeline.version = function () {
       return "1.0.0";
     };
-    function nada(selection) {
-      console.log("clientHeight-->", selection._groups[0][0].clientHeight);
-      selection.each(function () {
-        d3.select(this)
-          .append("rect")
-          .attr("width", selection._groups[0][0].clientWidth)
-          .attr("height", selection._groups[0][0].clientHeight)
-          .attr("fill", "green");
-      });
-    }
-    return timeline;
-    //return nada;
-
-
-
+      return timeline;
   };
-
-
-
   exports.timeline = timeline;
-
 }));
 
 

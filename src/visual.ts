@@ -35,15 +35,15 @@ export class Visual implements IVisual {
 
   public update(options: VisualUpdateOptions): void {
     // en esta version solo tomará maximo 48hs, para que no colapse
-    const CantHorasMaximasEnLineaDeTiempo = 48; // el eje X
+    // ya no lo usamos, ahora automaticmente el eje pasa a dias const CantHorasMaximasEnLineaDeTiempo = 48; // el eje X 
     const CantMaxEquiposAComparar = 25; //el eje Y
     const CantMaxregistros = 1000;  //no pude aumentar esto en capabilities.json
     const MensajeExceso =
       "Maximo alcanzado, se muestran hasta " +
       CantMaxEquiposAComparar +
       " lineas, " +
-      CantHorasMaximasEnLineaDeTiempo +
-      " Horas y " +
+      //CantHorasMaximasEnLineaDeTiempo +
+      //" Horas y " +
       CantMaxregistros +
       " registros";
 
@@ -146,19 +146,18 @@ export class Visual implements IVisual {
           const fin = fines[i] as string;
 
           if (!grupo) continue; //obligatorio
+          /*
           if (
             formatoFechaHora(fin) >
             FechaInicialGrafico +
               CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000
           ) {
-            //console.log(FechaInicialGrafico)
-            //console.log(FechaInicialGrafico + CantHorasMaximasEnLineaDeTiempo * 60 * 60 * 1000)
-            //console.log (fin)
             grupo = MensajeExceso;
             grupoMap[grupo] = [];
             continue; //maximo 48Hs en el grafico
           }
-          //console.log(Object.keys(grupoMap).length)
+            */
+          
           if (Object.keys(grupoMap).length == CantMaxEquiposAComparar) {
             grupo = MensajeExceso;
           }
